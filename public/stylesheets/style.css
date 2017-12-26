@@ -1,8 +1,32 @@
 body {
-  padding: 50px;
+  padding-top: 0px;
+  background-color: rgba(184,147,32,0.39);
+  padding-left: 80px;
+  padding-right: 80px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
-  color: #00B7FF;
+  color: #000000;
+}
+
+li {
+  font-size: 20px;
+}
+
+ul {
+  list-style-type: none;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 80px;
+}
+
+button {
+  background-color: #F8F8FF;
+  color: black;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  font-size: 16px;
+  padding: 8px;
 }

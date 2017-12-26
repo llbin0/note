@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/admin.css'/>
+</head>
+<body>
+<h1><%= title %></h1>
+<p>Welcome/p>
+<div align="right">
+
+<a id="aA" style="font-size: 25px; color: black; cursor: pointer">待审核</a>
+|
+<a id="aB" style="font-size: 25px; color: black; cursor: pointer">已通过</a>
+|
+<a id="aC" style="font-size: 25px; color: black; cursor: pointer;">全部</a>
+</div>
+<div id="id_user_notes">
+    <!--add-->
+</div>
+
+<script>
+    var mode = 1;
+    var lastMode = 1;
+</script>
+
+<script>
+    document.getElementById("aA").onclick = function () {
+        lastMode = mode;
+        mode = 1;
+        lastTimeData = null;
+        // alert(mode+";"+lastMode);
+    }
+    document.getElementById("aB").onclick = function () {
+        lastMode = mode;
+        mode = 2;
+        lastTimeData = null;
+        // alert(mode+";"+lastMode);
+    }
+    document.getElementById("aC").onclick = function () {
+        lastMode = mode;
+        mode = 3;
+        lastTimeData = null;
+        // alert(mode+";"+lastMode);
+    }
+</script>
+
+<script>
+    loadData();
+
+    function loadData() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {  /*所有数据已经就绪*/
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                    // alert(xhr.responseText);
+                    if (xhr.responseText === lastTimeData) {
+
+                    } else {
+                        lastTimeData = xhr.responseText;
+                        var jsonObj = JSON.parse(xhr.responseText);
+                        getUserNote(jsonObj);
+                    }
+                } else {
+                    alert("response was unsuccessful: " + xhr.status);
+                }
+            }
+        };
+        xhr.open("GET", "http://localhost:3000/notes", true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.send(null);
+    }
+
+    function getUserNote(userNote) {
+        var addNoteList = document.getElementById("id_user_notes");
+        var childNotes = addNoteList.childNodes;
+        var _html = "";
+        var setId = 0;
+        addNoteList.innerHTML = "";
+        _html = "";
+        for (var i in userNote) {
+            var date = new Date(i);
+            var text1 = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+            var user = userNote[i].User;
+            var text2 = userNote[i].Note;
+            if (userNote[i].Param == 1) {
+                var text3 = "所有人可见";
+            } else {
+                var text3 = "匿名";
+            }
+            if (userNote[i].state == 1) {
+                var color = "#faebd7";
+            } else {
+                var color = "#ffe2cf"
+            }
+            switch (mode) {
+                case 1:
+                    if (userNote[i].state == 1) {
+                        var insert = "<ul style='background: "+color+"; border-radius: 20px; margin-top: 10px;'>" +
+                            "<li>" +
+                            ""+text1 +
+                            "<br/>" +
+                            "<button id='a" + setId + "' name='"+text1 + "' class='"+user +"' style='float: right;margin-right: 30px; margin-top: 18px; background: white'>添加</button>" +
+                            "<button id='b" + (setId+1) + "' name='"+text1+"' class='"+user+ "'  style='float: right;margin-right: 30px; margin-top: 18px;'>删除</button>" +
+                            "<br/>" + user + "<br/><br/>" +
+                            "<b>“"+text2+ "”</b>" +
+                            "<br/><br/>" +
+                            "<li style='font-size: 13px'>" +text3 + "</li>" +
+                            "</li>" +
+                            "</ul>";
+                        setId+=2;
+                        console.log(i + ":" + setId);
+                        _html += insert;
+                    }
+                    break;
+                case 2:
+                    if (userNote[i].state == 2) {
+                        var insert = "<ul style='background: "+color+"; border-radius: 20px; margin-top: 10px;'>" +
+                            "<li>" +
+                            ""+text1 +
+                            "<br/>" +
+                            "<button id='b" + setId + "' name='"+text1+"' class='"+user+ "'  style='float: right;margin-right: 30px; margin-top: 18px;'>删除</button>" +
+                            "<br/>" + user + "<br/><br/>" +
+                            "<b>“"+text2+ "”</b>" +
+                            "<br/><br/>" +
+                            "<li style='font-size: 13px'>" +text3 + "</li>" +
+                            "</li>" +
+                            "</ul>";
+                        setId++;
+                        console.log(i + ":" + setId);
+                        _html += insert;
+                    }
+                    break;
+
+                case 3:
+                    var insert = "<ul style='background: "+color+"; border-radius: 20px; margin-top: 10px;'>" +
+                        "<li>" +
+                        ""+text1 +
+                        "<br/><br/>"  + user + "<br/><br/>" +
+                        "<b>“"+text2+ "”</b>" +
+                        "<br/><br/>" +
+                        "<li style='font-size: 13px'>" +text3 + "</li>" +
+                        "</li>" +
+                        "</ul>";
+                    setId++;
+                    console.log(i + ":" + setId);
+                    _html += insert;
+                    break;
+            }
+        }
+        addNoteList.innerHTML = _html
+        console.log(_html);
+        setDeleteListener(addNoteList, childNotes);
+    }
+</script>
+
+<script>
+    var lastTimeData = "";
+    setInterval("loadData()","1000");
+</script>
+
+<script>
+    function setDeleteListener(addNoteList, childNotes) {
+        var list = document.getElementsByTagName("button");
+        for(var i = 0; i < list.length; i++) {
+            list[i].onclick = (function(i) {
+                return function() {
+                    // alert(document.getElementById("b" + (i-1)).name);
+                    // alert(i);
+                    if (i%2 == 0) {
+                        // alert(document.getElementById("a" + (i)).id);
+                        addNote(document.getElementById("a" + (i)).className,document.getElementById("a" + (i)).name);
+                        // alert(document.getElementById("a" + (i)).className + ":" + i);
+                    }else if (i%2 == 1) {
+                        deleteNote(document.getElementById("b" + (i)).className,document.getElementById("b" + (i)).name);
+                        // alert(document.getElementById("b" + (i)).id);
+                    }
+                }
+            }(i));
+        }
+    }
+
+    function deleteNote(userName, date) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {  /*所有数据已经就绪*/
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                    // alert(xhr.responseText);
+                } else {
+                    alert("response was unsuccessful: " + xhr.status);
+                }
+            }
+        };
+        try {
+            xhr.open("DELETE", "http://localhost:3000/notes/" + userName + "/" + date, true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send(null);
+        } catch (err) {
+
+        }
+    }
+
+    function addNote(userName, date) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {  /*所有数据已经就绪*/
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                    // alert(xhr.responseText);
+                } else {
+                    alert("response was unsuccessful: " + xhr.status);
+                }
+            }
+        };
+        try {
+            xhr.open("PUT", "http://localhost:3000/notes/" + userName + "/" + date, true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send(null);
+        } catch (err) {
+
+        }
+    }
+
+</script>
+
+<script>
+    var lastTimeData = "";
+    setInterval("loadData()","300");
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/login.css' />
+</head>
+<body>
+<h1><%= title %></h1>
+<p>Welcome</p>
+
+<div align="center" style="background-color: #d8ffe3; border-radius: 10px; margin-left: 120px; margin-right: 120px;">
+
+
+    <form >
+        <br/>
+        <h2>
+            用户名：<input
+                    type="text" class="input"
+                    style="height: 25px; border-radius: 15px; border: 1px; outline: none; padding-left: 20px;"
+                    id="id_username"
+                    name="username"/>
+        </h2>
+        <br/>
+        <h2>
+            密 &nbsp;&nbsp;&nbsp;码：<input
+                    type="password" class="input"
+                    style="height: 25px; border-radius: 15px; border: 1px; outline: none; padding-left: 20px;"
+                    id="id_password"
+                    name="password"/>
+        </h2>
+        <br/>
+
+        <br/>
+
+    </form>
+
+    <button
+            type="button"
+            style="
+                width: 60px;
+                height: 30px;
+                background-color: white;
+                outline: none;
+                border: none;
+                border-radius: 0px;
+                font-size: 18px;
+                color: black;
+                margin-bottom: 20px"
+            id="id_login">
+
+        登陆
+    </button>
+
+    <br/>
+
+</div>
+
+<script>
+    var loginButton = document.getElementById('id_login');
+    loginButton.onclick = function () {
+        var params = "User=" + document.getElementById('id_username').value + "&Password=" + document.getElementById('id_password').value;
+        /*异步*/
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {  /*所有数据已经就绪*/
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                    if (xhr.responseText.indexOf("http")!= -1) {
+                        top.location.href = xhr.responseText;
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                } else {
+                    alert("response was unsuccessful: " + xhr.status);
+                }
+            }
+        };
+        console.log(params);
+        xhr.open("POST", "http://localhost:3000/admin_signin", true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.send(params);
+    }
+</script>
+</body>
+</html>

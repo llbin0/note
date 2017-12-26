@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+
+        <div style="width: 100%; height: 160px; background-color: chocolate" class="titleBar;" id="titleBar">
+            <h1 style="color: #fdfbfb; padding-left: 30px; padding-top: 20px; font-size: 40px">留言板</h1>
+            <h3 style="color: #efefe8; padding-left: 15px">&nbsp;&nbsp;&nbsp;MessageBoard</h3>
+        </div>
+
+    </head>
+    <body>
+        <div align="right">
+            <h2>
+                <a href="./login" target="_self" id="signIn" style="text-decoration: none; ">登陆</a>
+               |
+                <a href="./register" target="_self" id="signUp" style="text-decoration: none;">注册</a>
+            </h2>
+
+        </div>
+        <h1>MessageBoard</h1>
+        <p>Welcome</p>
+        <textarea cols="50" rows="4" style="font-size: 50px; align-self: center"></textarea>
+        <br/>
+        <br/>
+        <button   id="b1" style="width: 100px; height: 40px; background-color: rgba(234,107,27,0.33); color: #fdfbfb; border-radius: 20px; border: none; outline: none;">
+            提交</button>
+        <input id="id_checkBox" type="checkbox">
+        匿名
+        <br/>
+
+        <div id="id_user_notes" >
+            <!--add-->
+        </div>
+        <script>
+            document.getElementById("b1").onclick=function ()
+            {
+                alert("请登陆后再留言");
+            }
+        </script>
+
+        <div id="id_user_notes">
+            <!--add-->
+        </div>
+
+        <script>
+            document.getElementById('titleBar').style.boxShadow = "0px 0px 10px 3px #fbfbfb";
+        </script>
+
+
+        <script>
+            loadData();
+
+            function loadData() {
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4) {  /*所有数据已经就绪*/
+                        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                            // alert(xhr.responseText);
+                            if (xhr.responseText === lastTimeData) {
+
+                            } else {
+                                lastTimeData = xhr.responseText;
+                                var jsonObj = JSON.parse(xhr.responseText);
+                                getUserNote(jsonObj);
+                            }
+                        } else {
+                            alert("response was unsuccessful: " + xhr.status);
+                        }
+                    }
+                };
+                xhr.open("GET", "http://localhost:3000/notes", true);
+                xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhr.send(null);
+            }
+
+            function getUserNote(userNote) {
+                var addNoteList = document.getElementById("id_user_notes");
+                var childNotes = addNoteList.childNodes;
+                // alert(childNotes.length);
+                var _html = "";
+                var setId = 0;
+                addNoteList.innerHTML = "";
+                _html = "";
+                /*创建标签*/
+                console.log(userNote);
+                for (var i in userNote) {
+                    var date = new Date(i);
+                    var text1 = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                    var user = userNote[i].User;
+                    var text2 = userNote[i].Note;
+                    if (userNote[i].Param == 2) {
+                        user = "匿名";
+                    }
+
+                    var color="#FAEBD7";
+                    var insert = "<ul style='background: "+color+"; border-radius: 20px; margin-top: 10px;'>" +
+                        "<li>" +
+                        ""+text1 +
+                        "<br/>" +
+                        "<br/>" +
+                        "" + user + ":"+
+                        "<b>“"+text2+ "”</b>" +
+                        "<br/><br/>" +
+                        "</li>" +
+                        "</ul>"
+                    if (userNote[i].state == 2) {
+                        _html += insert;
+                    }
+                }
+                addNoteList.innerHTML = _html
+                console.log(_html);
+                setDeleteListener(addNoteList, childNotes);
+            }
+        </script>
+
+        <script>
+            var lastTimeData = "";
+            setInterval("loadData()","1000");
+        </script>
+
+        <script>
+            function setDeleteListener(addNoteList, childNotes) {
+                var list = document.getElementsByTagName("button");
+                for(var i = 0; i < list.length; i++) {
+                    list[i].onclick = (function(i) {
+                        return function() {
+                            // alert(document.getElementById("b" + (i-1)).name);
+                            // alert(i);
+                            if (i%2 == 0) {
+                                alert(document.getElementById("a" + (i)).id);
+                                // addNote(document.getElementById("a" + (i)).className,document.getElementById("a" + (i)).name);
+                                // alert(document.getElementById("a" + (i)).className + ":" + i);
+                            }else if (i%2 == 1) {
+                                deleteNote(document.getElementById("b" + (i)).className,document.getElementById("b" + (i)).name);
+                                // alert(document.getElementById("b" + (i)).name + ":" + i + ":" + document.getElementById("b" + (i)).className);
+                            }
+                        }
+                    }(i));
+                }
+            }
+
+            function deleteNote(userName, date) {
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4) {  /*所有数据已经就绪*/
+                        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                            // alert(xhr.responseText);
+                        } else {
+                            alert("response was unsuccessful: " + xhr.status);
+                        }
+                    }
+                };
+                try {
+                    xhr.open("DELETE", "http://localhost:3000/notes/" + userName + "/" + date, true);
+                    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    xhr.send(null);
+                } catch (err) {
+
+                }
+            }
+
+            function addNote(userName, date) {
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4) {  /*所有数据已经就绪*/
+                        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                            // alert(xhr.responseText);
+                        } else {
+                            alert("response was unsuccessful: " + xhr.status);
+                        }
+                    }
+                };
+                try {
+                    xhr.open("PUT", "http://localhost:3000/notes/" + userName + "/" + date, true);
+                    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    xhr.send(null);
+                } catch (err) {
+
+                }
+            }
+
+        </script>
+
+        <script>
+            var lastTimeData = "";
+            setInterval("loadData()","300");
+        </script>
+
+    </body>
+</html>

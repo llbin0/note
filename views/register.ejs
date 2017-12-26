@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/login.css'/>
+</head>
+<body>
+    <h1>用户注册</h1>
+    <p>Welcome</p>
+    <div align="center" style="background-color: #d8ffe3; border-radius: 10px; margin-left: 120px; margin-right: 120px;">
+
+        <form >
+            <br/>
+            <h2>
+                用户名：&nbsp;&nbsp;<input
+                        type="text" class="input"
+                        style="height: 25px; border-radius: 15px; border: 1px; outline: none; padding-left: 20px;"
+                        id="id_username"
+                        name="username"/>
+            </h2>
+            <br/>
+            <h2>
+                密 &nbsp;&nbsp;&nbsp;码：&nbsp;&nbsp;<input
+                        type="password" class="input"
+                        style="height: 25px; border-radius: 15px; border: 1px; outline: none; padding-left: 20px;"
+                        id="id_password"
+                        name="password"/>
+            </h2>
+            <br/>
+
+            <h2>
+                确认密码：<input
+                        type="password" class="input"
+                        style="height: 25px; border-radius: 15px; border: 1px; outline: none; padding-left: 20px;"
+                        id="id_password_again"
+                        name="password"/>
+            </h2>
+            <br/>
+            <br/>
+
+            <br/>
+
+        </form>
+
+        <button
+                type="button"
+                style="
+                width: 60px;
+                height: 30px;
+                background-color: white;
+                outline: none;
+                border: none;
+                border-radius: 0px;
+                font-size: 18px;
+                color: black;
+                margin-bottom: 20px"
+                id="id_register">
+
+            注册
+        </button>
+
+        <br/>
+    </div>
+
+    <script>
+        var loginButton = document.getElementById('id_register');
+        loginButton.onclick = function () {
+            if (document.getElementById('id_username').value === "") {
+                alert("用户名不可以为空");
+            } else if (document.getElementById('id_password').value === "") {
+                alert("密码不可以为空")
+            } else if (!(document.getElementById('id_password').value === document.getElementById('id_password_again').value)) {
+                alert("前后密码不一致");
+            } else if (userIsExist) {
+                alert("用户名已被注册");
+            }else {
+                var params = "User=" + document.getElementById('id_username').value + "&Password=" + document.getElementById('id_password').value;
+                /*异步*/
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4) {  /*所有数据已经就绪*/
+                        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                            if (xhr.responseText.indexOf("http")!= -1) {
+                                top.location.href = xhr.responseText;
+                            } else {
+                                alert(xhr.responseText);
+                            }
+                        } else {
+                            alert("response was unsuccessful: " + xhr.status);
+                        }
+                    }
+                };
+                xhr.open("POST", "http://localhost:3000/register", true);
+                xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhr.send(params);
+            }
+        }
+    </script>
+
+    <script>
+        var userIsExist = false;
+        document.getElementById('id_username').onchange = function () {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {  /*所有数据已经就绪*/
+                    if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                        if (xhr.responseText === "1") {
+                            // console.log(xhr.responseText);
+                            userIsExist = true;
+                            alert("用户已注册");
+                        } else {
+                            userIsExist = false;
+                        }
+                    } else {
+                        alert("response was unsuccessful: " + xhr.status);
+                    }
+                }
+            };
+            xhr.open("GET", "http://localhost:3000/user/" + document.getElementById('id_username').value, true);
+            xhr.send(null);
+        }
+    </script>
+</body>
+</html>

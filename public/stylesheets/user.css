@@ -1,0 +1,43 @@
+body {
+    padding-left: 200px;
+    padding-right: 200px;
+    padding-top: 0px;
+    background-color: rgba(184,147,32,0.39);
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+    color: #000000;
+}
+
+li {
+    font-size: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: #FAEBD7;
+}
+
+button {
+    background-color: #F8F8FF;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    outline: none;
+    font-size: 16px;
+    padding: 8px;
+    margin-left: 20px;
+    box-shadow: 0px 0px 20px 1px #efefe8;
+}
+
+textarea {
+    box-shadow: 0px 0px 5px 5px #efefe8;
+}
+
+table {
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px 1px #FAEBD7;
+}
